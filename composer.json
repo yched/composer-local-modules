@@ -1,0 +1,32 @@
+{
+    "name": "yched/composer-local-modules",
+    "type": "composer-plugin",
+    "minimum-stability": "dev",
+    "license": "BSD",
+    "description": "Adds local modules as composer packages",
+    "keywords": [
+        "composer", "drupal", "plugin"
+    ],
+    "authors": [
+        {
+            "name": "Yves Chedemois",
+            "email": "y.chedemois@gmail.com"
+        }
+        
+    ],
+    "autoload": {
+      "psr-4": {"yched\\Composer\\DrupalLocalModules\\": "src"}
+    },
+    "require": {
+        "composer-plugin-api": "1.0.0"
+    },    
+    "require-dev": {
+        "composer/composer": "1.*"
+    },
+    "extra": {
+        "class": "yched\\Composer\\DrupalLocalModules\\Plugin",
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
