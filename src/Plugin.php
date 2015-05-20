@@ -60,6 +60,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
       $localRepo = $repositoryManager->createRepository('local_folders', [
         'directories' => $extra['local_directories'],
       ]);
+      // @todo We should add the repo in first position so that it takes precedency.
       $repositoryManager->addRepository($localRepo);
 
       // Add all discovered local packages as requirements to the top-level composer.json

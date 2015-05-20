@@ -166,7 +166,7 @@ class LocalModuleRepository extends ArrayRepository {
     $packageData['version'] = 'dev-master';
     $packageData['type'] = 'drupal-local';
     if (empty($packageData['name'])) {
-      $packageData['name'] = 'drupal-local/' . $name;
+      $packageData['name'] = 'drupal/' . $name;
     }
 
     return $this->loader->load($packageData);
