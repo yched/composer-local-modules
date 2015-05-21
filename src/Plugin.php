@@ -7,12 +7,13 @@
 namespace yched\Composer\DrupalLocalModules;
 
 use Composer\Composer;
-use Composer\IO\IOInterface;
-use Composer\Package\Link;
-use Composer\Package\LinkConstraint\VersionConstraint;
-use Composer\Script\Event;
-use Composer\Plugin\PluginInterface;
 use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\IO\IOInterface;
+use Composer\Installer\InstallerEvent;
+use Composer\Installer\InstallerEvents;
+use Composer\Package\LinkConstraint\VersionConstraint;
+use Composer\Plugin\PluginInterface;
+use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 
 class Plugin implements PluginInterface, EventSubscriberInterface {
@@ -28,50 +29,63 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   protected $io;
 
   /**
-   * @var array
+   * @var LocalModuleRepository
    */
-  protected $localDirectories = [];
-
-  public function activate(Composer $composer, IOInterface $io) {
-    $this->io = $io;
-    $this->composer = $composer;
-
-    // Register our "local_folders" repository type, and the associated (no-op) installer.
-    $this->composer->getInstallationManager()->addInstaller(new LocalModuleInstaller());
-    $repositoryManager = $this->composer->getRepositoryManager();
-    $repositoryManager->setRepositoryClass('local_folders', 'yched\Composer\DrupalLocalModules\LocalModuleRepository');
-  }
+  protected $localRepo;
 
   /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
     return [
-      ScriptEvents::PRE_INSTALL_CMD => "addLocalPackages",
-      ScriptEvents::PRE_UPDATE_CMD => "addLocalPackages",
+      ScriptEvents::PRE_INSTALL_CMD => "addLocalRepo",
+      ScriptEvents::PRE_UPDATE_CMD => "addLocalRepo",
+      InstallerEvents::PRE_DEPENDENCIES_SOLVING => "addLocalPackages",
     ];
   }
 
-  public function addLocalPackages(Event $event) {
+  /**
+   * {@inheritdoc}
+   */
+  public function activate(Composer $composer, IOInterface $io) {
+    $this->io = $io;
+    $this->composer = $composer;
+  }
+
+  /**
+   * Adds the "local_folders" repository.
+   *
+   * @param Event $event
+   */
+  public function addLocalRepo(Event $event) {
     $extra = $this->composer->getPackage()->getExtra();
     if (!empty($extra['local_directories'])) {
-      // Add our "local_folders" repository.
       $repositoryManager = $this->composer->getRepositoryManager();
-      $localRepo = $repositoryManager->createRepository('local_folders', [
+      $installationManager = $this->composer->getInstallationManager();
+
+      // Register our "local_folders" repository type, and the associated (no-op) installer.
+      $repositoryManager->setRepositoryClass('local_folders', 'yched\Composer\DrupalLocalModules\LocalModuleRepository');
+      $this->localRepo = $repositoryManager->createRepository('local_folders', [
         'directories' => $extra['local_directories'],
       ]);
       // @todo We should add the repo in first position so that it takes precedency.
-      $repositoryManager->addRepository($localRepo);
+      $repositoryManager->addRepository($this->localRepo);
+      $installationManager->addInstaller(new LocalModuleInstaller());
+    }
+  }
 
-      // Add all discovered local packages as requirements to the top-level composer.json
-      $rootPackage = $this->composer->getPackage();
-      $requires = $rootPackage->getRequires();
-      foreach ($localRepo->getPackages() as $package) {
+  /**
+   * Adds all discovered local packages as requirements.
+   *
+   * @param InstallerEvent $event
+   */
+  public function addLocalPackages(InstallerEvent $event) {
+    if (isset($this->localRepo)) {
+      $request = $event->getRequest();
+      foreach ($this->localRepo->getPackages() as $package) {
         /** @var $package \Composer\Package\PackageInterface */
-        $contraint = new VersionConstraint('=', $package->getVersion());
-        $requires[$package->getName()] = new Link($rootPackage->getName(), $package->getName(), $contraint, 'requires', $package->getPrettyVersion());
+        $request->install($package->getName(), new VersionConstraint('=', $package->getVersion()), TRUE);
       }
-      $rootPackage->setRequires($requires);
     }
   }
 
