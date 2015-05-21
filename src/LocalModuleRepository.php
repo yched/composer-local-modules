@@ -157,17 +157,21 @@ class LocalModuleRepository extends ArrayRepository {
     }
 
     $packageData = JsonFile::parseJson($json);
+
+    if (empty($packageData['name'])) {
+      $packageData['name'] = 'drupal/' . $name;
+    }
+    // Force a high version number so that the local version takes precedency
+    // if the package exists on packagist (e.g local fork).
+    $packageData['version'] = '9999999999';
+    $packageData['type'] = 'drupal-local';
     $packageData['dist'] = array(
       // @todo Not sure what this is used for...
       'type' => 'local',
       'url' => $file->getRealPath(),
       'shasum' => sha1_file($file->getRealPath())
     );
-    $packageData['version'] = 'dev-master';
-    $packageData['type'] = 'drupal-local';
-    if (empty($packageData['name'])) {
-      $packageData['name'] = 'drupal/' . $name;
-    }
+
 
     return $this->loader->load($packageData);
   }

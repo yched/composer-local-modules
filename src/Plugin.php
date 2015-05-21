@@ -64,11 +64,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
       $installationManager = $this->composer->getInstallationManager();
 
       // Register our "local_folders" repository type, and the associated (no-op) installer.
+      // There is no way to add it first so that it take precedency on the remote ones,
+      // but we enforce and then require a high version on the local packages, so that they
+      // always win.
       $repositoryManager->setRepositoryClass('local_folders', 'yched\Composer\DrupalLocalModules\LocalModuleRepository');
       $this->localRepo = $repositoryManager->createRepository('local_folders', [
         'directories' => $extra['local_directories'],
       ]);
-      // @todo We should add the repo in first position so that it takes precedency.
       $repositoryManager->addRepository($this->localRepo);
       $installationManager->addInstaller(new LocalModuleInstaller());
     }
