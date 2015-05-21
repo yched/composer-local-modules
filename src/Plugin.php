@@ -36,7 +36,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     $this->io = $io;
     $this->composer = $composer;
 
-    // Register our "local_folders" repositorty type, and the associated (no-op) installer.
+    // Register our "local_folders" repository type, and the associated (no-op) installer.
     $this->composer->getInstallationManager()->addInstaller(new LocalModuleInstaller());
     $repositoryManager = $this->composer->getRepositoryManager();
     $repositoryManager->setRepositoryClass('local_folders', 'yched\Composer\DrupalLocalModules\LocalModuleRepository');
