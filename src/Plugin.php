@@ -54,7 +54,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 
   public function addLocalPackages(Event $event) {
     $extra = $this->composer->getPackage()->getExtra();
-    if (isset($extra['local_directories'])) {
+    if (!empty($extra['local_directories'])) {
       // Add our "local_folders" repository.
       $repositoryManager = $this->composer->getRepositoryManager();
       $localRepo = $repositoryManager->createRepository('local_folders', [
