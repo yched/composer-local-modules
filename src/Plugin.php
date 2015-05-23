@@ -86,7 +86,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
       $request = $event->getRequest();
       foreach ($this->localRepo->getPackages() as $package) {
         /** @var $package \Composer\Package\PackageInterface */
-        $request->install($package->getName(), new VersionConstraint('=', $package->getVersion()), TRUE);
+        $request->fix($package->getName(), new VersionConstraint('=', $package->getVersion()));
       }
     }
   }
