@@ -3,7 +3,7 @@ This composer plugin allows your custom drupal modules and themes, locally commi
 The plugin discovers modules and themes in the folders you specify in your project's root composer.json (see [configuration](#user-content-configuration) below), and automatically enforces them as required packages with no download during `composer update` / `composer json`. The dependencies specified in their composer.json thus get resolved and downloaded along with the rest of your project's contrib modules.
 
 ## Installation
-composer require yched/composer-local-modules "1.*"
+`composer require yched/composer-local-modules "1.*"`
 
 ## Configuration
 You need to specify in your root compser.json which directories contain locally committed modules and themes :
@@ -15,4 +15,4 @@ You need to specify in your root compser.json which directories contain locally 
     ]
   }
 ```
-(the axample above is for the project template suggested by https://github.com/drupal-composer/drupal-project)
+(the example paths above are for the project template suggested by https://github.com/drupal-composer/drupal-project)
