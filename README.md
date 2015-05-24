@@ -6,7 +6,7 @@ The plugin discovers modules and themes in the folders you specify in your proje
 `composer require yched/composer-local-modules "1.*"`
 
 ## Configuration
-You need to specify in your root compser.json which directories contain locally committed modules and themes :
+You need to specify in your root compser.json which directories to scan for local custom modules and themes :
 ```json
   "extra": {
     "local_directories": [
@@ -15,4 +15,4 @@ You need to specify in your root compser.json which directories contain locally 
     ]
   }
 ```
-(the example paths above are for the project template suggested by https://github.com/drupal-composer/drupal-project)
+Paths are relative to the project root compooser.json file (the example paths above are for the project template suggested by https://github.com/drupal-composer/drupal-project)
